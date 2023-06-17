@@ -22,6 +22,7 @@
 #define Ny 16
 #define Nz 16//グリッドの数
 
+#define Tamb 25
 #define g0 9.8
 using ScalarType = double;
 using IndexType = int64_t;
@@ -31,31 +32,27 @@ typedef Eigen::SparseMatrix<double, Eigen::RowMajor, int64_t> SpMat;
 struct Fluid{
     double dx;//セルの大きさ
     double dt;//時間の刻み幅
-    double rho;
+    //double rho;
     myArray3d u = myArray3d(Nx+1,Ny,Nz,0);//水平
     myArray3d old_u = myArray3d(Nx+1,Ny,Nz,0);//水平
-    myArray3d umi = myArray3d(Nx+1,Ny,Nz,0);//Gridの重さ
-    myArray3d ufi = myArray3d(Nx+1,Ny,Nz,0);//Gridに加わる外力
-    
     myArray3d v = myArray3d(Nx,Ny+1,Nz,0);//鉛直
     myArray3d old_v = myArray3d(Nx,Ny+1,Nz,0);//水平
-    myArray3d vmi = myArray3d(Nx,Ny+1,Nz,0);//Gridの重さ
-    myArray3d vfi = myArray3d(Nx,Ny+1,Nz,0);//Gridに加わる外力
-    
     myArray3d w = myArray3d(Nx,Ny,Nz+1,0);
     myArray3d old_w = myArray3d(Nx,Ny,Nz+1,0);
-    myArray3d wmi = myArray3d(Nx,Ny,Nz+1,0);//Gridの重さ
-    myArray3d wfi = myArray3d(Nx,Ny,Nz+1,0);//Gridに加わる外力
-    
     myArray3d p = myArray3d(Nx,Ny,Nz,0);//圧力
-    std::vector<double> weights;//粒子の重み
-    double L;
-    Eigen::Vector3d f0 = {0.0,-g0,0.0};
+    myArray3d rho = myArray3d(Nx,Ny,Nz,0);
+    myArray3d temp = myArray3d(Nx,Ny,Nz,Tamb);
+    
+    //double L;
     Fluid();
-    Fluid(double x,double t,double density);
-    std::vector<int>DirichletBoundaryCondition(int i,int j,int k,myMap &map);
-    void project(myMap &map);
-    void advect();
-    double Fluid::interporation(double x,double y,double z,myArray3d &val,double dx);
+    //Fluid(double x,double t,double density);
+    Fluid(double x,double t,myArray3d &density,myArray3d &temprature);
+    //std::vector<int>DirichletBoundaryCondition(int i,int j,int k,myMap &map);
+    void project();
+//    void project(myMap &map);
+    void faceAdvect();
+    void centerAdvect(myArray3d &val);
+    double TriLinearInterporation(double x,double y,double z,myArray3d &val);
+    
 };
 #endif /* Fluid_hpp */
