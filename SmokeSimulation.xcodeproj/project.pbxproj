@@ -10,6 +10,7 @@
 		670FDCAE2A3890B90072D963 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 670FDCAD2A3890B90072D963 /* main.cpp */; };
 		670FDCB62A3891550072D963 /* Fluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 670FDCB42A3891550072D963 /* Fluid.cpp */; };
 		670FDCB92A3892110072D963 /* Array3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 670FDCB72A3892110072D963 /* Array3d.cpp */; };
+		67D142852A3ED8860050170D /* output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67D142832A3ED8860050170D /* output.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +32,8 @@
 		670FDCB52A3891550072D963 /* Fluid.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Fluid.hpp; sourceTree = "<group>"; };
 		670FDCB72A3892110072D963 /* Array3d.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Array3d.cpp; sourceTree = "<group>"; };
 		670FDCB82A3892110072D963 /* Array3d.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Array3d.hpp; sourceTree = "<group>"; };
+		67D142832A3ED8860050170D /* output.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = output.cpp; sourceTree = "<group>"; };
+		67D142842A3ED8860050170D /* output.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = output.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +70,8 @@
 				670FDCB42A3891550072D963 /* Fluid.cpp */,
 				670FDCB52A3891550072D963 /* Fluid.hpp */,
 				670FDCB72A3892110072D963 /* Array3d.cpp */,
+				67D142832A3ED8860050170D /* output.cpp */,
+				67D142842A3ED8860050170D /* output.hpp */,
 				670FDCB82A3892110072D963 /* Array3d.hpp */,
 			);
 			path = SmokeSimulation;
@@ -129,6 +134,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				67D142852A3ED8860050170D /* output.cpp in Sources */,
 				670FDCB92A3892110072D963 /* Array3d.cpp in Sources */,
 				670FDCB62A3891550072D963 /* Fluid.cpp in Sources */,
 				670FDCAE2A3890B90072D963 /* main.cpp in Sources */,

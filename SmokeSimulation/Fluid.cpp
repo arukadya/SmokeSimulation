@@ -35,38 +35,53 @@
 
 #include "Fluid.hpp"
 Fluid::Fluid(){}
-//Fluid::Fluid(double x,double t,double density){
-//    dx = x;
-//    dt = t;
-//    rho = density;
-//    L = dx*Nx;
-//    vfi.reset(f0.y());
-//}
-Fluid::Fluid(double x,double t,myArray3d &density,myArray3d &temprature){
+Fluid::Fluid(double x,double t,myArray3<double> &density,myArray3<double> &templature){
     dx = x;
     dt = t;
     rho = density;
-    temp = temprature;
+    temp = templature;
 }
-double Fluid::TriLinearInterporation(double x,double y,double z,myArray3d &val){
+void Fluid::setDensity(){
+    for(int i=0;i<Nx;i++){
+        for(int j=0;j<Ny;j++){
+            for(int k=0;k<Nz;k++){
+                if(Nx/3 < i && i < Nx/3*2 && j == 0 && Nz/3 < k && k < Nz/3*2)rho.value[i][j][k] = 2.0;
+                else rho.value[i][j][k] = 1.0;
+            }
+        }
+    }
+}
+void Fluid::setTemplature(){
+    for(int i=0;i<Nx;i++){
+        for(int j=0;j<Ny;j++){
+            for(int k=0;k<Nz;k++){
+                if(Nx/3 < i && i < Nx/3*2 && j == 0 && Nz/3 < k && k < Nz/3*2)temp.value[i][j][k] = 100;
+            }
+        }
+    }
+}
+double Fluid::TriLinearInterporation(double x,double y,double z,myArray3<double> &val){
     x = fmax(0.0, fmin(val.nx-1-1e-6,x/dx));
     y = fmax(0.0, fmin(val.ny-1-1e-6,y/dx));
     z = fmax(0.0, fmin(val.nz-1-1e-6,z/dx));
     int i = x;int j = y;int k = z;
     double s = x-i;double t = y-i;double u = z-i;
-    Eigen::VectorXd f = {
+    Eigen::Vector<double,8> f = {
         val.value[i][j][k],val.value[i+1][j][k],val.value[i][j+1][k],val.value[i][j][k+1],
         val.value[i+1][j+1][k],val.value[i][j+1][k+1],val.value[i+1][j][k+1],val.value[i+1][j+1][k+1]};
-    Eigen::VectorXd c = {
+    Eigen::Vector<double,8> c = {
         (1-s)*t*u,s*t*u,(1-s)*(1-t)*u,(1-s)*t*(1-u),
         s*(1-t)*u,(1-s)*(1-t)*(1-u),s*t*(1-u),s*(1-t)*(1-u)};
     return f.dot(c);
 }
 void Fluid::faceAdvect(){
     //x
+    old_u = u;
+    old_v = v;
+    old_w = w;
     for(int i=1;i<u.nx;++i){
         for(int j=0;j<u.ny;++j){
-            for(int k=0;j<u.nz;++k){
+            for(int k=0;k<u.nz;++k){
                 double x = i*dx;double y = (j+0.5)*dx;double z = (k+0.5)*dx;
                 double adv_x = x - dt*TriLinearInterporation(x, y-0.5*dx, z-0.5*dx, old_u);
                 double adv_y = y - dt*TriLinearInterporation(x-0.5*dx, y, z-0.5*dx, old_v);
@@ -77,18 +92,20 @@ void Fluid::faceAdvect(){
     }
     for(int i=0;i<v.nx;++i){
         for(int j=1;j<v.ny;++j){
-            for(int k=0;j<v.nz;++k){
+            for(int k=0;k<v.nz;++k){
                 double x = (i+0.5)*dx;double y = j*dx;double z = (k+0.5)*dx;
                 double adv_x = x - dt*TriLinearInterporation(x, y-0.5*dx, z-0.5*dx, old_u);
                 double adv_y = y - dt*TriLinearInterporation(x-0.5*dx, y, z-0.5*dx, old_v);
                 double adv_z = z - dt*TriLinearInterporation(x-0.5*dx, y-0.5*dx, z, old_w);
                 v.value[i][j][k] = TriLinearInterporation(adv_x, adv_y, adv_z, old_v);
+                //if(Nx/3 < i && i < Nx/3*2 && j < 3 && Nz/3 < k && k < Nz/3*2)
+                std::cout <<"(" << i << "," << j << "," << k << ")=(" << adv_x/dx << "," << adv_y/dx <<"," << adv_z/dx <<")"<< std::endl;
             }
         }
     }
     for(int i=0;i<w.nx;++i){
         for(int j=0;j<w.ny;++j){
-            for(int k=1;j<w.nz;++k){
+            for(int k=1;k<w.nz;++k){
                 double x = (i+0.5)*dx;double y = (j+0.5)*dx;double z = k*dx;
                 double adv_x = x - dt*TriLinearInterporation(x, y-0.5*dx, z-0.5*dx, old_u);
                 double adv_y = y - dt*TriLinearInterporation(x-0.5*dx, y, z-0.5*dx, old_v);
@@ -97,12 +114,16 @@ void Fluid::faceAdvect(){
             }
         }
     }
+//    std::cout << "old_v" << std::endl;
+//    old_v.print();
+//    std::cout << "v" << std::endl;
+//    v.print();
 }
-void Fluid::centerAdvect(myArray3d &val){
-    myArray3d old_val = val;
+void Fluid::centerAdvect(myArray3<double> &val){
+    myArray3<double> old_val = val;
     for(int i=0;i<val.nx;++i){
         for(int j=0;j<val.ny;++j){
-            for(int k=0;j<val.nz;++k){
+            for(int k=0;k<val.nz;++k){
                 double x = (i+0.5)*dx;double y = (j+0.5)*dx;double z = (k+0.5)*dx;
                 double adv_x = x - dt*TriLinearInterporation(x, y-0.5*dx, z-0.5*dx, u);
                 double adv_y = y - dt*TriLinearInterporation(x-0.5*dx, y, z-0.5*dx, v);
@@ -220,13 +241,121 @@ void Fluid::project(){
         }
     }
 }
-void cal_buoyanacy(){
+Eigen::Vector3d Fluid::getBuoyanacy(int i,int j, int k){
     Eigen::Vector3d dir_gravity = {0.0,1.0,0.0};
+    return dx*(-g0*rho.value[i][j][k] + beta*(temp.value[i][j][k] - Tamb))*dir_gravity;
+}
+
+void Fluid::setCenterRot(){
+    for(int i=1;i<Nx-1;i++){
+        for(int j=1;j<Ny-1;j++){
+            for(int k=1;k<Nz-1;k++){
+                double u_P = (u.value[i-1][j][k+1] + u.value[i][j][k])/2;
+                double u_M = (u.value[i-1][j][k] + u.value[i][j][k-1])/2;
+                double v_P = (v.value[i+1][j-1][k] + v.value[i][j][k])/2;
+                double v_M = (v.value[i][j-1][k] + v.value[i-1][j][k])/2;
+                double w_P = (w.value[i][j+1][k-1] + w.value[i][j][k])/2;
+                double w_M = (w.value[i][j][k-1] + w.value[i][j-1][k])/2;
+                double x = (w_P - w_M - v_P+ v_M)/2*dx;
+                double y = (u_P - u_M - w_P + w_M)/2*dx;
+                double z = (v_P - v_M - u_P + u_M)/2*dx;
+                centerRot.value[i][j][k] = {x,y,z};
+            }
+        }
+    }
+}
+Eigen::Vector3d Fluid::getConfinement(int i,int j,int k){
+    if(i==0||j==0||k==0)std::cout << "error_0" << std::endl;
+    if(i==Nx-1||j==Ny-1||k==Nz-1)std::cout << "error_Nx" << std::endl;
+    double u_P = centerRot.value[i][j][k+1].x();
+    double u_M = centerRot.value[i][j][k-1].x();
+    double v_P = centerRot.value[i+1][j][k].y();
+    double v_M = centerRot.value[i-1][j][k].y();
+    double w_P = centerRot.value[i][j+1][k].z();
+    double w_M = centerRot.value[i][j-1][k].z();
+    double x = (w_P - w_M - v_P+ v_M)/2*dx;
+    double y = (u_P - u_M - w_P + w_M)/2*dx;
+    double z = (v_P - v_M - u_P + u_M)/2*dx;
+    double scale = epcilon*dx*centerRot.value[i][j][k].norm();
+    return {x*scale,y*scale,z*scale};
+}
+void Fluid::addForce(){
+    setCenterRot();
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
-                
+                f.value[i][j][k] = getBuoyanacy(i, j, k);
             }
         }
+    }
+    for(int i=1;i<Nx-1;i++){
+        for(int j=1;j<Ny-1;j++){
+            for(int k=1;k<Nz-1;k++){
+                //f.value[i][j][k] += getConfinement(i, j, k);
+            }
+        }
+    }
+    //x
+    for(int i=1;i<f.nx;i++){
+        for(int j=0;j<f.ny;j++){
+            for(int k=0;k<f.nz;k++){
+                u.value[i][j][k] += (f.value[i-1][j][k].x() + f.value[i][j][k].x())/2;
+            }
+        }
+    }
+    //y
+    for(int i=0;i<f.nx;i++){
+        for(int j=1;j<f.ny;j++){
+            for(int k=0;k<f.nz;k++){
+                v.value[i][j][k] += (f.value[i][j-1][k].y() + f.value[i][j][k].x())/2;
+            }
+        }
+    }
+    //z
+    for(int i=0;i<f.nx;i++){
+        for(int j=0;j<f.ny;j++){
+            for(int k=1;k<f.nz;k++){
+                w.value[i][j][k] += (f.value[i][j][k-1].x() + f.value[i][j][k].x())/2;
+            }
+        }
+    }
+}
+
+void Fluid::oneloop(){
+    addForce();
+    std::cout << "addForce" << std::endl;
+    faceAdvect();
+    //v.print();
+    std::cout << "faceAdvect" << std::endl;
+    project();
+    std::cout << "project" << std::endl;
+    centerAdvect(temp);
+    std::cout << "centerAdvectTemp" << std::endl;
+    centerAdvect(rho);
+    std::cout << "centerAdvectRho" << std::endl;
+}
+void Fluid::execute(){
+    dx = 0.01;
+    dt = 0.1;
+    setDensity();
+    setTemplature();
+    std::cout << "Initialize" << std::endl;
+    std::string rootFolderName = "Result";
+    std::string pressureFolderName = rootFolderName + "/pressure";
+    std::string densityFolderName = rootFolderName + "/density";
+    std::string templatureFolderName = rootFolderName + "/templature";
+    std::filesystem::create_directories(rootFolderName);
+    std::filesystem::create_directories(pressureFolderName);
+    std::filesystem::create_directories(densityFolderName);
+    std::filesystem::create_directories(templatureFolderName);
+    for(int i=0;i<timestep;++i){
+        //p.print();
+        oneloop();
+        std::string OutputVTK_pre = pressureFolderName+  "/output"+std::to_string(i)+".vtk";
+        std::string OutputVTK_den = densityFolderName+  "/output"+std::to_string(i)+".vtk";
+        std::string OutputVTK_tem = templatureFolderName+  "/output"+std::to_string(i)+".vtk";
+        outputVTK(OutputVTK_pre,p,dx);
+        outputVTK(OutputVTK_den,rho,dx);
+        outputVTK(OutputVTK_tem,temp,dx);
     }
 }
