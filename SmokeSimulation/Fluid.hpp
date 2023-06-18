@@ -19,13 +19,13 @@
 #include <Eigen/IterativeLinearSolvers>
 #include "Array3d.hpp"
 #include "output.hpp"
-#define Nx 16
-#define Ny 16
-#define Nz 16//グリッドの数
+#define Nx 9
+#define Ny 9
+#define Nz 9//グリッドの数
 
 #define Tamb 25
 #define g0 9.8
-#define beta 9.8
+#define beta 1.0
 #define epcilon 1.0
 #define timestep 100
 using ScalarType = double;

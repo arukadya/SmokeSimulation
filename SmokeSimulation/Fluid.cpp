@@ -34,7 +34,10 @@
 
 
 #include "Fluid.hpp"
-Fluid::Fluid(){}
+Fluid::Fluid(){
+    dx = 1;
+    dt = 1;
+}
 Fluid::Fluid(double x,double t,myArray3<double> &density,myArray3<double> &templature){
     dx = x;
     dt = t;
@@ -45,7 +48,7 @@ void Fluid::setDensity(){
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
-                if(Nx/3 < i && i < Nx/3*2 && j == 0 && Nz/3 < k && k < Nz/3*2)rho.value[i][j][k] = 2.0;
+                if(Nx/3 < i && i < Nx/3*2 && k == 0 && Nz/3 < j && j < Nz/3*2)rho.value[i][j][k] = 2.0;
                 else rho.value[i][j][k] = 1.0;
             }
         }
@@ -55,23 +58,36 @@ void Fluid::setTemplature(){
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
-                if(Nx/3 < i && i < Nx/3*2 && j == 0 && Nz/3 < k && k < Nz/3*2)temp.value[i][j][k] = 100;
+                if(Nx/3 < i && i < Nx/3*2 && k == 0 && Nz/3 < j && j < Nz/3*2)temp.value[i][j][k] = 100;
             }
         }
     }
 }
 double Fluid::TriLinearInterporation(double x,double y,double z,myArray3<double> &val){
+//    std::cout << "input_xyz = (" << x << "," << y << "," << z << ")" << std::endl;
+//    std::cout << "x=fmax(0.0, fmin(" << val.nx-1-1e-6 << "," << x/dx << "));" << std::endl;
     x = fmax(0.0, fmin(val.nx-1-1e-6,x/dx));
+//    std::cout << "x=fmax(0.0, fmin(" << val.ny-1-1e-6 << "," << y/dx << "));"<< std::endl;
     y = fmax(0.0, fmin(val.ny-1-1e-6,y/dx));
+//    std::cout << "x=fmax(0.0, fmin(" << val.nz-1-1e-6 << "," << z/dx << "));"<< std::endl;
     z = fmax(0.0, fmin(val.nz-1-1e-6,z/dx));
+//    std::cout << "fix_xyz = (" << x << "," << y << "," << z << ")" << std::endl;
     int i = x;int j = y;int k = z;
-    double s = x-i;double t = y-i;double u = z-i;
+//    std::cout << "index_ijk = (" << i << "," << j << "," << k << ")" << std::endl;
+    double s = x-i;double t = y-j;double u = z-k;
+//    std::cout << "ratio_stu = (" << s << "," << t << "," << u << ")" << std::endl;
     Eigen::Vector<double,8> f = {
         val.value[i][j][k],val.value[i+1][j][k],val.value[i][j+1][k],val.value[i][j][k+1],
         val.value[i+1][j+1][k],val.value[i][j+1][k+1],val.value[i+1][j][k+1],val.value[i+1][j+1][k+1]};
     Eigen::Vector<double,8> c = {
-        (1-s)*t*u,s*t*u,(1-s)*(1-t)*u,(1-s)*t*(1-u),
-        s*(1-t)*u,(1-s)*(1-t)*(1-u),s*t*(1-u),s*(1-t)*(1-u)};
+        (1-s)*(1-t)*(1-u),s*(1-t)*(1-u),s*t*(1-u),(1-s)*t*(1-u),
+        (1-s)*(1-t)*u,s*(1-t)*u,s*t*u,(1-s)*t*u};
+//    std::cout << f[0] << "," << f[1] << "," << f[2] << "," << f[3] << std::endl;
+//    std::cout << f[4] << "," << f[5] << "," << f[6] << "," << f[7] << std::endl;
+//    std::cout << c[0] << "," << c[1] << "," << c[2] << "," << c[3] << std::endl;
+//    std::cout << c[4] << "," << c[5] << "," << c[6] << "," << c[7] << std::endl;
+//    std::cout << u <<"( ("<< t << "( (" << 1-s << ")"<<f[0] << "+" << s <<f[1] << ")+(" << 1-t << "( (" << 1-s << ")" << f[2] << "+" << s << f[4] << ") )" << std::endl;
+//    for(int i=0;i<8;++i)std::cout << f[i]*c[i] << std::endl;
     return f.dot(c);
 }
 void Fluid::faceAdvect(){
@@ -99,7 +115,7 @@ void Fluid::faceAdvect(){
                 double adv_z = z - dt*TriLinearInterporation(x-0.5*dx, y-0.5*dx, z, old_w);
                 v.value[i][j][k] = TriLinearInterporation(adv_x, adv_y, adv_z, old_v);
                 //if(Nx/3 < i && i < Nx/3*2 && j < 3 && Nz/3 < k && k < Nz/3*2)
-                std::cout <<"(" << i << "," << j << "," << k << ")=(" << adv_x/dx << "," << adv_y/dx <<"," << adv_z/dx <<")"<< std::endl;
+                //std::cout <<"(" << i << "," << j << "," << k << ")=(" << adv_x/dx << "," << adv_y/dx <<"," << adv_z/dx <<")"<< std::endl;
             }
         }
     }
@@ -114,10 +130,6 @@ void Fluid::faceAdvect(){
             }
         }
     }
-//    std::cout << "old_v" << std::endl;
-//    old_v.print();
-//    std::cout << "v" << std::endl;
-//    v.print();
 }
 void Fluid::centerAdvect(myArray3<double> &val){
     myArray3<double> old_val = val;
@@ -336,7 +348,7 @@ void Fluid::oneloop(){
 }
 void Fluid::execute(){
     dx = 0.01;
-    dt = 0.1;
+    dt = 0.001;
     setDensity();
     setTemplature();
     std::cout << "Initialize" << std::endl;
@@ -349,7 +361,7 @@ void Fluid::execute(){
     std::filesystem::create_directories(densityFolderName);
     std::filesystem::create_directories(templatureFolderName);
     for(int i=0;i<timestep;++i){
-        //p.print();
+        p.print();
         oneloop();
         std::string OutputVTK_pre = pressureFolderName+  "/output"+std::to_string(i)+".vtk";
         std::string OutputVTK_den = densityFolderName+  "/output"+std::to_string(i)+".vtk";
