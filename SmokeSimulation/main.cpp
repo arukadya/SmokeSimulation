@@ -9,11 +9,6 @@
 #include "Fluid.hpp"
 #include "Array3d.hpp"
 int main(int argc, const char * argv[]) {
-//    double dx = 0.01;
-//    double dt = 0.1;
-//    myArray3<double> density;
-//    myArray3<double> templature;
-//    Fluid simulator = Fluid(dx,dt,density,templature);
     Fluid simulator = Fluid();
     simulator.execute();
 //    myArray3<double> test = myArray3<double>(2,2,3,0);
@@ -21,14 +16,14 @@ int main(int argc, const char * argv[]) {
 //    test.value[1][0][0] = 10;
 //    test.value[1][1][0] = 10;
 //    test.value[0][1][0] = 10;
-//    test.value[0][0][1] = 0;
-//    test.value[1][0][1] = 1;
-//    test.value[1][1][1] = 2;
-//    test.value[0][1][1] = 3;
-//    test.value[0][0][2] = 4;
-//    test.value[1][0][2] = 5;
-//    test.value[1][1][2] = 6;
-//    test.value[0][1][2] = 7;
+//    test.value[0][0][1] = 100;
+//    test.value[1][0][1] = 100;
+//    test.value[1][1][1] = 100;
+//    test.value[0][1][1] = 100;
+//    test.value[0][0][2] = 100;
+//    test.value[1][0][2] = 100;
+//    test.value[1][1][2] = 100;
+//    test.value[0][1][2] = 100;
 //
-//    std::cout << simulator.TriLinearInterporation(0.6, 0.2, 1.3, test) << std::endl;
+//    std::cout << simulator.TriLinearInterporation(0.6, 0.2, -1, test) << std::endl;
 }
