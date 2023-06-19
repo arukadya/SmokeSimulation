@@ -23,16 +23,19 @@ void outputVTK(std::string OutputFileName,myArray3<double> &val,double dx){
     writing_file << "POINT_DATA " << val.size << std::endl;
     writing_file << "SCALARS value float 1" << std::endl;
     writing_file << "LOOKUP_TABLE default" << std::endl;
-    for(int i=0;i<nx;i++){
+//    for(int i=0;i<nx;i++){
+//        for(int j=0;j<ny;j++){
+//            for(int k=0;k<nz;k++){
+//                writing_file << val.value[i][j][k] << std::endl;
+//            }
+//        }
+//    }
+    for(int k=0;k<nz;k++){
         for(int j=0;j<ny;j++){
-            for(int k=0;k<nz;k++){
+            for(int i=0;i<nx;i++){
                 writing_file << val.value[i][j][k] << std::endl;
-                //std::cout << val.value[i][j][k] << ",";
             }
-            //std::cout << std::endl;
         }
-        //std::cout << std::endl;
     }
-    //std::cout << std::endl;
     writing_file.close();
 }

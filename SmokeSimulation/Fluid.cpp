@@ -48,7 +48,7 @@ void Fluid::setDensity(){
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
-                if(Nx/3 < i && i < Nx/3*2 && k == Nz-1 && Nz/3 < j && j < Nz/3*2)rho.value[i][j][k] = 10.0;
+                if(Nx/5 < i && i < Nx/5*4 && k > Nz-3 && Ny/5 < j && j < Ny/5*4)rho.value[i][j][k] = 100.0;
                 else rho.value[i][j][k] = 1.0;
             }
         }
@@ -58,7 +58,7 @@ void Fluid::setTemplature(){
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
-                if(Nx/3 < i && i < Nx/3*2 && k == Nz-1 && Nz/3 < j && j < Nz/3*2)temp.value[i][j][k] = 35;
+                if(Nx/5*2 < i && i < Nx/5*3 && k > Nz-3 && Ny/5*2 < j && j < Ny/5*3)temp.value[i][j][k] = 100;
             }
         }
     }
@@ -89,7 +89,7 @@ void Fluid::faceAdvect(){
     old_u = u;
     old_v = v;
     old_w = w;
-    for(int i=1;i<u.nx;++i){
+    for(int i=1;i<u.nx-1;++i){
         for(int j=0;j<u.ny;++j){
             for(int k=0;k<u.nz;++k){
                 double x = i*dx;double y = (j+0.5)*dx;double z = (k+0.5)*dx;
@@ -101,7 +101,7 @@ void Fluid::faceAdvect(){
         }
     }
     for(int i=0;i<v.nx;++i){
-        for(int j=1;j<v.ny;++j){
+        for(int j=1;j<v.ny-1;++j){
             for(int k=0;k<v.nz;++k){
                 double x = (i+0.5)*dx;double y = j*dx;double z = (k+0.5)*dx;
                 double adv_x = x - dt*TriLinearInterporation(x, y-0.5*dx, z-0.5*dx, old_u);
@@ -115,7 +115,7 @@ void Fluid::faceAdvect(){
     }
     for(int i=0;i<w.nx;++i){
         for(int j=0;j<w.ny;++j){
-            for(int k=1;k<w.nz;++k){
+            for(int k=1;k<w.nz-1;++k){
                 double x = (i+0.5)*dx;double y = (j+0.5)*dx;double z = k*dx;
                 double adv_x = x - dt*TriLinearInterporation(x, y-0.5*dx, z-0.5*dx, old_u);
                 double adv_y = y - dt*TriLinearInterporation(x-0.5*dx, y, z-0.5*dx, old_v);
@@ -164,7 +164,7 @@ void Fluid::project(){
     SparseMatrix A(Nx*Ny*Nz,Nx*Ny*Nz),B(Nx*Ny*Nz,Nx*Ny*Nz);
     Eigen::VectorXd b = Eigen::VectorXd::Zero(Nx*Ny*Nz);
     Eigen::VectorXd px;
-//    std::set<int> DirichletKey;
+    std::set<int> DirichletKey;
 //    std::vector<std::vector<int>>keys;
     //Tripletの計算
     std::vector<Triplet> triplets;
@@ -174,10 +174,12 @@ void Fluid::project(){
 //                std::vector<int>key = {i,j,k};
 //                if(!map.contains(key)){
 //                    //前処理でAが変更されてしまうので，境界条件として別で無理矢理設定する．
-//                    triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+k*Nx*Ny,1);
-//                    keys.push_back(key);
-//                    DirichletKey.insert(i+j*Nx+k*Nx*Ny);
-//                    continue;
+                if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1 /*|| k==Nz-1*/){
+                    triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+k*Nx*Ny,1);
+                    DirichletKey.insert(i+j*Nx+k*Nx*Ny);
+                    continue;
+                }
+                    
 //                }
                 double scale = dt/(rho.value[i][j][k]*dx*dx);
                 //std::cout << i << "," << j << std::endl;
@@ -214,14 +216,19 @@ void Fluid::project(){
     }
     A.setFromTriplets(triplets.begin(), triplets.end());
     Eigen::ConjugateGradient<SparseMatrix> solver;
-//    for(int i=0;i<A.outerSize();++i){
-//        for(SparseMatrix::InnerIterator it(A,i);it;++it){
-//            if(it.row() == *DirichletKey.begin()){
-//                it.valueRef() = 1;
-//                DirichletKey.erase(DirichletKey.begin());
-//            }
-//        }
-//    }
+    //ディリクレ境界条件の設定
+    for(int i=0;i<A.outerSize();++i){
+        for(SparseMatrix::InnerIterator it(A,i);it;++it){
+            int id_col = it.col();
+            int id_row = it.row();
+            int k = id_col/(Nx*Ny);
+            int tmp = id_col%(Nx*Ny);
+            int j = tmp/Nx;
+            int i = tmp%Nx;
+            //std::cout << "i,j,k = " << i << "," << j << "," << k << std::endl;
+            if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1/* || k==Nz-1*/)it.valueRef()=1;
+        }
+    }
     solver.compute(A);
     px = solver.solve(b);
     for(int i=0;i<Nx;i++){
@@ -262,9 +269,9 @@ void Fluid::setCenterRot(){
                 double v_M = (v.value[i][j-1][k] + v.value[i-1][j][k])/2;
                 double w_P = (w.value[i][j+1][k-1] + w.value[i][j][k])/2;
                 double w_M = (w.value[i][j][k-1] + w.value[i][j-1][k])/2;
-                double x = (w_P - w_M - v_P+ v_M)/2*dx;
-                double y = (u_P - u_M - w_P + w_M)/2*dx;
-                double z = (v_P - v_M - u_P + u_M)/2*dx;
+                double x = (w_P - w_M - v_P+ v_M)/(2*dx);
+                double y = (u_P - u_M - w_P + w_M)/(2*dx);
+                double z = (v_P - v_M - u_P + u_M)/(2*dx);
                 centerRot.value[i][j][k] = {x,y,z};
             }
         }
@@ -273,17 +280,13 @@ void Fluid::setCenterRot(){
 Eigen::Vector3d Fluid::getConfinement(int i,int j,int k){
     if(i==0||j==0||k==0)std::cout << "error_0" << std::endl;
     if(i==Nx-1||j==Ny-1||k==Nz-1)std::cout << "error_Nx" << std::endl;
-    double u_P = centerRot.value[i][j][k+1].x();
-    double u_M = centerRot.value[i][j][k-1].x();
-    double v_P = centerRot.value[i+1][j][k].y();
-    double v_M = centerRot.value[i-1][j][k].y();
-    double w_P = centerRot.value[i][j+1][k].z();
-    double w_M = centerRot.value[i][j-1][k].z();
-    double x = (w_P - w_M - v_P+ v_M)/2*dx;
-    double y = (u_P - u_M - w_P + w_M)/2*dx;
-    double z = (v_P - v_M - u_P + u_M)/2*dx;
-    double scale = epcilon*dx*centerRot.value[i][j][k].norm();
-    return {x*scale,y*scale,z*scale};
+    Eigen::Vector3d N = {
+        (centerRot.value[i+1][j][k].norm()-centerRot.value[i-1][j][k].norm())/(2*dx),
+        centerRot.value[i][j+1][k].norm()-centerRot.value[i][j-1][k].norm()/(2*dx),
+        centerRot.value[i][j][k+1].norm()-centerRot.value[i][j][k-1].norm()/(2*dx)
+    };
+    N.normalize();
+    return epcilon*dx*N.cross(centerRot.value[i][j][k]);
 }
 void Fluid::addForce(){
     setCenterRot();
@@ -297,12 +300,12 @@ void Fluid::addForce(){
     for(int i=1;i<Nx-1;i++){
         for(int j=1;j<Ny-1;j++){
             for(int k=1;k<Nz-1;k++){
-                //f.value[i][j][k] += getConfinement(i, j, k);
+                f.value[i][j][k] += getConfinement(i, j, k);
             }
         }
     }
     //x
-    for(int i=1;i<f.nx;i++){
+    for(int i=1;i<f.nx-1;i++){
         for(int j=0;j<f.ny;j++){
             for(int k=0;k<f.nz;k++){
                 u.value[i][j][k] += (f.value[i-1][j][k].x() + f.value[i][j][k].x())/2;
@@ -311,7 +314,7 @@ void Fluid::addForce(){
     }
     //y
     for(int i=0;i<f.nx;i++){
-        for(int j=1;j<f.ny;j++){
+        for(int j=1;j<f.ny-1;j++){
             for(int k=0;k<f.nz;k++){
                 v.value[i][j][k] += (f.value[i][j-1][k].y() + f.value[i][j][k].x())/2;
             }
@@ -320,7 +323,7 @@ void Fluid::addForce(){
     //z
     for(int i=0;i<f.nx;i++){
         for(int j=0;j<f.ny;j++){
-            for(int k=1;k<f.nz;k++){
+            for(int k=1;k<f.nz-1;k++){
                 w.value[i][j][k] += (f.value[i][j][k-1].x() + f.value[i][j][k].x())/2;
             }
         }
@@ -344,7 +347,7 @@ void Fluid::execute(){
     dx = 0.1;
     dt = 0.001;
     setDensity();
-    setTemplature();
+//    setTemplature();
     std::cout << "Initialize" << std::endl;
     std::string rootFolderName = "Result";
     std::string pressureFolderName = rootFolderName + "/pressure";
@@ -355,7 +358,14 @@ void Fluid::execute(){
     std::filesystem::create_directories(densityFolderName);
     std::filesystem::create_directories(templatureFolderName);
     for(int i=0;i<timestep;++i){
+        setTemplature();
         //p.print();
+//        std::cout << "u" << std::endl;
+//        u.print();
+//        std::cout << "v" << std::endl;
+//        v.print();
+//        std::cout << "w" << std::endl;
+//        w.print();
         oneloop();
         std::string OutputVTK_pre = pressureFolderName+  "/output"+std::to_string(i)+".vtk";
         std::string OutputVTK_den = densityFolderName+  "/output"+std::to_string(i)+".vtk";
