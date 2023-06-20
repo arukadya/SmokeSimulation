@@ -9,6 +9,7 @@
 #include "Fluid.hpp"
 #include "Array3d.hpp"
 int main(int argc, const char * argv[]) {
+    Eigen::initParallel();
     Fluid simulator = Fluid();
     simulator.execute();
 //    myArray3<double> test = myArray3<double>(2,2,3,0);

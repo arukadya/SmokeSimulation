@@ -11,6 +11,7 @@
 		670FDCB62A3891550072D963 /* Fluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 670FDCB42A3891550072D963 /* Fluid.cpp */; };
 		670FDCB92A3892110072D963 /* Array3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 670FDCB72A3892110072D963 /* Array3d.cpp */; };
 		67D142852A3ED8860050170D /* output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67D142832A3ED8860050170D /* output.cpp */; };
+		67D506E12A40A73A00EC142E /* rendering.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 67D506DF2A40A73A00EC142E /* rendering.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +35,8 @@
 		670FDCB82A3892110072D963 /* Array3d.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Array3d.hpp; sourceTree = "<group>"; };
 		67D142832A3ED8860050170D /* output.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = output.cpp; sourceTree = "<group>"; };
 		67D142842A3ED8860050170D /* output.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = output.hpp; sourceTree = "<group>"; };
+		67D506DF2A40A73A00EC142E /* rendering.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = rendering.cpp; sourceTree = "<group>"; };
+		67D506E02A40A73A00EC142E /* rendering.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = rendering.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +72,8 @@
 				670FDCAD2A3890B90072D963 /* main.cpp */,
 				670FDCB42A3891550072D963 /* Fluid.cpp */,
 				670FDCB52A3891550072D963 /* Fluid.hpp */,
+				67D506DF2A40A73A00EC142E /* rendering.cpp */,
+				67D506E02A40A73A00EC142E /* rendering.hpp */,
 				670FDCB72A3892110072D963 /* Array3d.cpp */,
 				67D142832A3ED8860050170D /* output.cpp */,
 				67D142842A3ED8860050170D /* output.hpp */,
@@ -135,6 +140,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				67D142852A3ED8860050170D /* output.cpp in Sources */,
+				67D506E12A40A73A00EC142E /* rendering.cpp in Sources */,
 				670FDCB92A3892110072D963 /* Array3d.cpp in Sources */,
 				670FDCB62A3891550072D963 /* Fluid.cpp in Sources */,
 				670FDCAE2A3890B90072D963 /* main.cpp in Sources */,
@@ -183,11 +189,12 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				GCC_VERSION = "g++";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -244,6 +251,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_VERSION = "g++";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;

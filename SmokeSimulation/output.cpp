@@ -14,7 +14,6 @@ void outputVTK(std::string OutputFileName,myArray3<double> &val,double dx){
     std::ofstream writing_file;
     std::cout << OutputFileName << std::endl;
     writing_file.open(OutputFileName, std::ios::out);
-    if(writing_file.is_open())std::cout << "success!!" << std::endl;
     std::string writing_text ="# vtk DataFile Version 2.0\nIsosurface\nASCII\nDATASET STRUCTURED_POINTS\n";
     writing_file << writing_text << std::endl;
     writing_file << "DIMENSIONS " << nx <<" "<< ny <<" "<< nz << std::endl;
@@ -23,13 +22,6 @@ void outputVTK(std::string OutputFileName,myArray3<double> &val,double dx){
     writing_file << "POINT_DATA " << val.size << std::endl;
     writing_file << "SCALARS value float 1" << std::endl;
     writing_file << "LOOKUP_TABLE default" << std::endl;
-//    for(int i=0;i<nx;i++){
-//        for(int j=0;j<ny;j++){
-//            for(int k=0;k<nz;k++){
-//                writing_file << val.value[i][j][k] << std::endl;
-//            }
-//        }
-//    }
     for(int k=0;k<nz;k++){
         for(int j=0;j<ny;j++){
             for(int i=0;i<nx;i++){

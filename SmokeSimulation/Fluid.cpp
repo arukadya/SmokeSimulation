@@ -44,21 +44,21 @@ Fluid::Fluid(double x,double t,myArray3<double> &density,myArray3<double> &templ
     rho = density;
     temp = templature;
 }
-void Fluid::setDensity(){
+void Fluid::setDensity(int set_range){
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
-                if(Nx/5 < i && i < Nx/5*4 && k > Nz-3 && Ny/5 < j && j < Ny/5*4)rho.value[i][j][k] = 100.0;
-                else rho.value[i][j][k] = 1.0;
+                if(Nx/2 - set_range < i && i < Nx/2 + set_range && k > Nz-3 && Ny/2 - set_range < j && j < Ny/2 + set_range)rho.value[i][j][k] = 2.0;
+                //else rho.value[i][j][k] = 1.0;
             }
         }
     }
 }
-void Fluid::setTemplature(){
+void Fluid::setTemplature(int set_range){
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
-                if(Nx/5*2 < i && i < Nx/5*3 && k > Nz-3 && Ny/5*2 < j && j < Ny/5*3)temp.value[i][j][k] = 100;
+                if(Nx/2 - set_range < i && i < Nx/2 + set_range && k > Nz-3 && Ny/2 - set_range < j && j < Ny/2 + set_range)temp.value[i][j][k] = 100;
             }
         }
     }
@@ -216,6 +216,7 @@ void Fluid::project(){
     }
     A.setFromTriplets(triplets.begin(), triplets.end());
     Eigen::ConjugateGradient<SparseMatrix> solver;
+    solver.setTolerance(1e-4);
     //ディリクレ境界条件の設定
     for(int i=0;i<A.outerSize();++i){
         for(SparseMatrix::InnerIterator it(A,i);it;++it){
@@ -332,23 +333,23 @@ void Fluid::addForce(){
 
 void Fluid::oneloop(){
     addForce();
-    std::cout << "addForce" << std::endl;
+    //std::cout << "addForce" << std::endl;
     faceAdvect();
     //v.print();
-    std::cout << "faceAdvect" << std::endl;
+    //std::cout << "faceAdvect" << std::endl;
     project();
-    std::cout << "project" << std::endl;
+    //std::cout << "project" << std::endl;
     centerAdvect(temp);
-    std::cout << "centerAdvectTemp" << std::endl;
+    //std::cout << "centerAdvectTemp" << std::endl;
     centerAdvect(rho);
-    std::cout << "centerAdvectRho" << std::endl;
+    //std::cout << "centerAdvectRho" << std::endl;
 }
 void Fluid::execute(){
     dx = 0.1;
     dt = 0.001;
-    setDensity();
+//    setDensity();
 //    setTemplature();
-    std::cout << "Initialize" << std::endl;
+    //std::cout << "Initialize" << std::endl;
     std::string rootFolderName = "Result";
     std::string pressureFolderName = rootFolderName + "/pressure";
     std::string densityFolderName = rootFolderName + "/density";
@@ -358,14 +359,8 @@ void Fluid::execute(){
     std::filesystem::create_directories(densityFolderName);
     std::filesystem::create_directories(templatureFolderName);
     for(int i=0;i<timestep;++i){
-        setTemplature();
-        //p.print();
-//        std::cout << "u" << std::endl;
-//        u.print();
-//        std::cout << "v" << std::endl;
-//        v.print();
-//        std::cout << "w" << std::endl;
-//        w.print();
+        setTemplature(range);
+        setDensity(range);
         oneloop();
         std::string OutputVTK_pre = pressureFolderName+  "/output"+std::to_string(i)+".vtk";
         std::string OutputVTK_den = densityFolderName+  "/output"+std::to_string(i)+".vtk";

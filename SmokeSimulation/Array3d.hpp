@@ -19,7 +19,7 @@ struct myArray3{
     int size;
     myArray3();
 //    myArray3(int size_x,int size_y,int size_z);
-    myArray3<T>(int size_x,int size_y,int size_z,T val);
+    myArray3(int size_x,int size_y,int size_z,T val);
     void reset(T val);
     void print();
     //std::vector<T> convert2Vector();
