@@ -48,7 +48,17 @@ void Fluid::setDensity(int set_range){
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
-                if(Nx/2 - set_range < i && i < Nx/2 + set_range && k > Nz-3 && Ny/2 - set_range < j && j < Ny/2 + set_range)rho.value[i][j][k] = 2.0;
+                if(Nx/2 - set_range < i && i < Nx/2 + set_range && k > Nz-3 && Ny/2 - set_range < j && j < Ny/2 + set_range)rho.value[i][j][k] = 5.0;
+                //else rho.value[i][j][k] = 1.0;
+            }
+        }
+    }
+}
+void Fluid::setV(int set_range){
+    for(int i=0;i<Nx;i++){
+        for(int j=0;j<Ny;j++){
+            for(int k=0;k<Nz;k++){
+                if(Nx/2 - set_range < i && i < Nx/2 + set_range && k > Nz-3 && Ny/2 - set_range < j && j < Ny/2 + set_range)v.value[i][j][k] = dx;
                 //else rho.value[i][j][k] = 1.0;
             }
         }
@@ -174,7 +184,7 @@ void Fluid::project(){
 //                std::vector<int>key = {i,j,k};
 //                if(!map.contains(key)){
 //                    //前処理でAが変更されてしまうので，境界条件として別で無理矢理設定する．
-                if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1 /*|| k==Nz-1*/){
+                if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1 ||k==Nz-1){
                     triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+k*Nx*Ny,1);
                     DirichletKey.insert(i+j*Nx+k*Nx*Ny);
                     continue;
@@ -227,7 +237,7 @@ void Fluid::project(){
             int j = tmp/Nx;
             int i = tmp%Nx;
             //std::cout << "i,j,k = " << i << "," << j << "," << k << std::endl;
-            if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1/* || k==Nz-1*/)it.valueRef()=1;
+            if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1 || k==Nz-1)it.valueRef()=1;
         }
     }
     solver.compute(A);
@@ -256,8 +266,8 @@ void Fluid::project(){
     }
 }
 Eigen::Vector3d Fluid::getBuoyanacy(int i,int j, int k){
-    Eigen::Vector3d dir_gravity = {0.0,-1.0,0.0};
-    return dx*(-g0*rho.value[i][j][k] + beta*(temp.value[i][j][k] - Tamb))*dir_gravity;
+    Eigen::Vector3d dir_gravity = {0.0,0.0,1.0};
+    return (-g0*rho.value[i][j][k] + beta*(temp.value[i][j][k] - Tamb))*dir_gravity;
 }
 
 void Fluid::setCenterRot(){
@@ -309,7 +319,7 @@ void Fluid::addForce(){
     for(int i=1;i<f.nx-1;i++){
         for(int j=0;j<f.ny;j++){
             for(int k=0;k<f.nz;k++){
-                u.value[i][j][k] += (f.value[i-1][j][k].x() + f.value[i][j][k].x())/2;
+                u.value[i][j][k] += dt*(f.value[i-1][j][k].x() + f.value[i][j][k].x())/2;
             }
         }
     }
@@ -317,7 +327,7 @@ void Fluid::addForce(){
     for(int i=0;i<f.nx;i++){
         for(int j=1;j<f.ny-1;j++){
             for(int k=0;k<f.nz;k++){
-                v.value[i][j][k] += (f.value[i][j-1][k].y() + f.value[i][j][k].x())/2;
+                v.value[i][j][k] += dt*(f.value[i][j-1][k].y() + f.value[i][j][k].y())/2;
             }
         }
     }
@@ -325,28 +335,31 @@ void Fluid::addForce(){
     for(int i=0;i<f.nx;i++){
         for(int j=0;j<f.ny;j++){
             for(int k=1;k<f.nz-1;k++){
-                w.value[i][j][k] += (f.value[i][j][k-1].x() + f.value[i][j][k].x())/2;
+                w.value[i][j][k] += dt*(f.value[i][j][k-1].z() + f.value[i][j][k].z())/2;
             }
         }
     }
 }
 
 void Fluid::oneloop(){
+    
     addForce();
-    //std::cout << "addForce" << std::endl;
+    std::cout << "addForce" << std::endl;
     faceAdvect();
     //v.print();
-    //std::cout << "faceAdvect" << std::endl;
+    std::cout << "faceAdvect" << std::endl;
     project();
-    //std::cout << "project" << std::endl;
+    std::cout << "project" << std::endl;
     centerAdvect(temp);
-    //std::cout << "centerAdvectTemp" << std::endl;
+    std::cout << "centerAdvectTemp" << std::endl;
     centerAdvect(rho);
-    //std::cout << "centerAdvectRho" << std::endl;
+    cal_voxTrans(rho, vox_trans);
+    //vox_trans.print();
+    std::cout << "centerAdvectRho" << std::endl;
 }
 void Fluid::execute(){
     dx = 0.1;
-    dt = 0.001;
+    dt = 0.01;
 //    setDensity();
 //    setTemplature();
     //std::cout << "Initialize" << std::endl;
@@ -354,19 +367,33 @@ void Fluid::execute(){
     std::string pressureFolderName = rootFolderName + "/pressure";
     std::string densityFolderName = rootFolderName + "/density";
     std::string templatureFolderName = rootFolderName + "/templature";
+    std::string imageFolderName = rootFolderName + "/image";
+    std::string transFolderName = rootFolderName + "/trans";
     std::filesystem::create_directories(rootFolderName);
     std::filesystem::create_directories(pressureFolderName);
     std::filesystem::create_directories(densityFolderName);
     std::filesystem::create_directories(templatureFolderName);
+    std::filesystem::create_directories(imageFolderName);
+    std::filesystem::create_directories(transFolderName);
     for(int i=0;i<timestep;++i){
-        setTemplature(range);
-        setDensity(range);
+        if(i < 10){
+            setTemplature(range);
+            setDensity(range);
+            //setV(range);
+        }
         oneloop();
         std::string OutputVTK_pre = pressureFolderName+  "/output"+std::to_string(i)+".vtk";
         std::string OutputVTK_den = densityFolderName+  "/output"+std::to_string(i)+".vtk";
         std::string OutputVTK_tem = templatureFolderName+  "/output"+std::to_string(i)+".vtk";
-        outputVTK(OutputVTK_pre,p,dx);
+        std::string OutputVTK_tra = transFolderName+  "/output"+std::to_string(i)+".vtk";
+        std::stringstream OutputPNG_image;
+        OutputPNG_image << std::setw(4) << std::setfill('0') << std::to_string(i);
+        std::string outputPNG = imageFolderName + "/output" + OutputPNG_image.str()+".png";
+        std::cout << std::setfill(' ');
+        //outputVTK(OutputVTK_pre,p,dx);
         outputVTK(OutputVTK_den,rho,dx);
-        outputVTK(OutputVTK_tem,temp,dx);
+        //outputVTK(OutputVTK_tem,temp,dx);
+        //outputVTK(OutputVTK_tra,vox_trans,dx);
+        //generateImage(outputPNG,vox_trans,rho);
     }
 }

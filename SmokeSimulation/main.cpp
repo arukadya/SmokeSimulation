@@ -4,7 +4,7 @@
 //
 //  Created by 須之内俊樹 on 2023/06/13.
 //
-
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <iostream>
 #include "Fluid.hpp"
 #include "Array3d.hpp"

@@ -21,14 +21,15 @@
 #include <Eigen/IterativeLinearSolvers>
 #include "Array3d.hpp"
 #include "output.hpp"
+#include "rendering.hpp"
 #define Nx 32
 #define Ny 32
-#define Nz 128//グリッドの数
-#define range 5
+#define Nz 32//グリッドの数
+#define range 2
 #define Tamb 25
 #define Ramb 1.0
 #define g0 9.8
-#define beta 0.1
+#define beta 1.0
 #define epcilon 1.0
 #define timestep 100
 using ScalarType = double;
@@ -51,6 +52,8 @@ struct Fluid{
     myArray3<double> temp = myArray3<double>(Nx,Ny,Nz,Tamb);
     myArray3<Eigen::Vector3d> centerRot = myArray3<Eigen::Vector3d>(Nx,Ny,Nz,Eigen::Vector3d::Zero());
     myArray3<Eigen::Vector3d> f = myArray3<Eigen::Vector3d>(Nx,Ny,Nz,Eigen::Vector3d::Zero());
+    
+    myArray3<double> vox_trans = myArray3<double>(Nx,Ny,Nz,0);
     //double L;
     Fluid();
     //Fluid(double x,double t,double density);
@@ -60,6 +63,7 @@ struct Fluid{
     void execute();
     void setDensity(int set_range);
     void setTemplature(int set_range);
+    void setV(int set_range);
     void project();
 //    void project(myMap &map);
     void faceAdvect();
