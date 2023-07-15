@@ -3,7 +3,7 @@
 //  Mable
 //
 //  Created by 須之内俊樹 on 2023/02/26.
-//
+// g++ main.cpp Fluid.cpp rendering.cpp Array3d.cpp output.cpp -I /Users/sunouchi/c++/library/eigen-3.4.0 -I /Users/sunouchi/c++/library/openmpi-4.1.5 -std=c++2a -fopenmp -O3 -I /Users/sunouchi/c++/library/MyLib
 
 #ifndef Fluid_hpp
 #define Fluid_hpp
@@ -24,13 +24,14 @@
 #include "rendering.hpp"
 #define Nx 32
 #define Ny 32
-#define Nz 32//グリッドの数
-#define range 2
+#define Nz 64 //グリッドの数
+#define range 0
 #define Tamb 25
-#define Ramb 1.0
+#define p0 0
+#define Ramb 1
 #define g0 9.8
-#define beta 1.0
-#define epcilon 1.0
+#define beta 300
+#define epcilon 100
 #define timestep 100
 using ScalarType = double;
 using IndexType = int64_t;
@@ -47,8 +48,9 @@ struct Fluid{
     myArray3<double> old_v = myArray3<double>(Nx,Ny+1,Nz,0);//水平
     myArray3<double> w = myArray3<double>(Nx,Ny,Nz+1,0);
     myArray3<double> old_w = myArray3<double>(Nx,Ny,Nz+1,0);
-    myArray3<double> p = myArray3<double>(Nx,Ny,Nz,0);//圧力
-    myArray3<double> rho = myArray3<double>(Nx,Ny,Nz,Ramb);
+    myArray3<double> p = myArray3<double>(Nx,Ny,Nz,p0);//圧力
+    myArray3<double> rho_tgt = myArray3<double>(Nx,Ny,Nz,0);
+    myArray3<double> rho_amb = myArray3<double>(Nx,Ny,Nz,Ramb);
     myArray3<double> temp = myArray3<double>(Nx,Ny,Nz,Tamb);
     myArray3<Eigen::Vector3d> centerRot = myArray3<Eigen::Vector3d>(Nx,Ny,Nz,Eigen::Vector3d::Zero());
     myArray3<Eigen::Vector3d> f = myArray3<Eigen::Vector3d>(Nx,Ny,Nz,Eigen::Vector3d::Zero());
@@ -63,6 +65,7 @@ struct Fluid{
     void execute();
     void setDensity(int set_range);
     void setTemplature(int set_range);
+    void setPressure(int set_range);
     void setV(int set_range);
     void project();
 //    void project(myMap &map);

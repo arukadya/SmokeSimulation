@@ -25,7 +25,8 @@ void outputVTK(std::string OutputFileName,myArray3<double> &val,double dx){
     for(int k=0;k<nz;k++){
         for(int j=0;j<ny;j++){
             for(int i=0;i<nx;i++){
-                writing_file << val.value[i][j][k] << std::endl;
+                if(abs(val.value[i][j][k]) < 1e-10) writing_file << 0 << std::endl;
+                else writing_file << val.value[i][j][k] << std::endl;
             }
         }
     }
