@@ -25,13 +25,16 @@
 #define Nx 32
 #define Ny 32
 #define Nz 64 //グリッドの数
-#define range 0
-#define Tamb 25
+#define Lx 1.0
+#define Ly 1.0
+#define Lz 2.0
+#define range 1
+#define Tamb 0
 #define p0 0
 #define Ramb 1
 #define g0 9.8
-#define beta 300
-#define epcilon 100
+#define beta 100
+#define epcilon 1e-4
 #define timestep 100
 using ScalarType = double;
 using IndexType = int64_t;
@@ -41,6 +44,8 @@ typedef Eigen::SparseMatrix<double, Eigen::RowMajor, int64_t> SpMat;
 struct Fluid{
     double dx;//セルの大きさ
     double dt;//時間の刻み幅
+    TimeDisplayer TD;
+    std::vector<double> times;
     //double rho;
     myArray3<double> u = myArray3<double>(Nx+1,Ny,Nz,0);//水平
     myArray3<double> old_u = myArray3<double>(Nx+1,Ny,Nz,0);//水平
@@ -68,13 +73,15 @@ struct Fluid{
     void setPressure(int set_range);
     void setV(int set_range);
     void project();
+    void cd_project();
 //    void project(myMap &map);
     void faceAdvect();
-    void centerAdvect(myArray3<double> &val);
+    void centerAdvect(myArray3<double> &val,double boundary_value);
     Eigen::Vector3d getBuoyanacy(int i,int j, int k);
     void setCenterRot();
     Eigen::Vector3d getConfinement(int i,int j,int k);
     double TriLinearInterporation(double x,double y,double z,myArray3<double> &val);
     void addForce();
+    
 };
 #endif /* Fluid_hpp */

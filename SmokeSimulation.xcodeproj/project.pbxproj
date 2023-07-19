@@ -33,6 +33,7 @@
 		670FDCB52A3891550072D963 /* Fluid.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Fluid.hpp; sourceTree = "<group>"; };
 		670FDCB72A3892110072D963 /* Array3d.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Array3d.cpp; sourceTree = "<group>"; };
 		670FDCB82A3892110072D963 /* Array3d.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Array3d.hpp; sourceTree = "<group>"; };
+		671150172A68457800B8E17E /* template_Mthesis_PR */ = {isa = PBXFileReference; lastKnownFileType = folder; path = template_Mthesis_PR; sourceTree = "<group>"; };
 		67D142832A3ED8860050170D /* output.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = output.cpp; sourceTree = "<group>"; };
 		67D142842A3ED8860050170D /* output.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = output.hpp; sourceTree = "<group>"; };
 		67D506DF2A40A73A00EC142E /* rendering.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = rendering.cpp; sourceTree = "<group>"; };
@@ -53,6 +54,7 @@
 		670FDCA12A3890B90072D963 = {
 			isa = PBXGroup;
 			children = (
+				671150172A68457800B8E17E /* template_Mthesis_PR */,
 				670FDCAC2A3890B90072D963 /* SmokeSimulation */,
 				670FDCAB2A3890B90072D963 /* Products */,
 			);

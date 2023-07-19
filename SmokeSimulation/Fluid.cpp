@@ -18,7 +18,7 @@ void Fluid::setPressure(int set_range){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
 //                if(Nx/2 - set_range < i && i < Nx/2 + set_range && k > Nz-3 && Ny/2 - set_range < j && j < Ny/2 +set_range)p.value[i][j][k] = 1.0;
-                if(Nx/2 - set_range <= i && i <= Nx/2 && k >= Nz-3 && Ny/2 - set_range <= j && j <= Ny/2 )p.value[i][j][k] = 1.0;
+                if(Nx/2 - set_range <= i && i <= Nx/2+ set_range -1 && k <= Nz-2 && Ny/2 - set_range <= j && j <= Ny/2 + set_range -1)p.value[i][j][k] = 1.0;
             }
         }
     }
@@ -28,7 +28,8 @@ void Fluid::setDensity(int set_range){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
 //                if(Nx/2 - set_range < i && i < Nx/2 + set_range && k > Nz-3 && Ny/2 - set_range < j && j < Ny/2 + set_range)rho_tgt.value[i][j][k] = 2.0;
-                if(Nx/2 - set_range <= i && i <= Nx/2 && k >= Nz-3 && Ny/2 - set_range <= j && j <= Ny/2 )rho_tgt.value[i][j][k] = 2.0;
+//                if(Nx/2 - set_range <= i && i <= Nx/2 && k >= Nz-3 && Ny/2 - set_range <= j && j <= Ny/2 )rho_tgt.value[i][j][k] = 2.0;
+                if(k >= Nz-2)rho_tgt.value[i][j][k] = 2.0;
                 //else rho.value[i][j][k] = 1.0;
             }
         }
@@ -39,7 +40,7 @@ void Fluid::setV(int set_range){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
 //                if(Nx/2 - set_range < i && i < Nx/2 + set_range && k > Nz-3 && Ny/2 - set_range < j && j < Ny/2 + set_range)w.value[i][j][k] = -dx;
-                if(Nx/2 - set_range <= i && i <= Nx/2 && k >= Nz-3 && Ny/2 - set_range <= j && j <= Ny/2 )w.value[i][j][k] = -dx;
+                if(Nx/2 - set_range <= i && i <= Nx/2 + set_range -1 && k >= Nz-2&& Ny/2 - set_range <= j && j <= Ny/2 + set_range -1)w.value[i][j][k] = -dx;
             }
         }
     }
@@ -49,7 +50,7 @@ void Fluid::setTemplature(int set_range){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
 //                if(Nx/2 - set_range < i && i < Nx/2 + set_range && k > Nz-3 && Ny/2 - set_range < j && j < Ny/2 + set_range)temp.value[i][j][k] = 100;
-                if(Nx/2 - set_range <= i && i <= Nx/2 && k >= Nz-3 && Ny/2 - set_range <= j && j <= Ny/2 )temp.value[i][j][k] = 100;
+                if(Nx/2 - set_range <= i && i <= Nx/2 + set_range -1 && k >= Nz-2 && Ny/2 - set_range <= j && j <= Ny/2 + set_range-1)temp.value[i][j][k] = 100;
             }
         }
     }
@@ -127,7 +128,7 @@ void Fluid::faceAdvect(){
         }
     }
 }
-void Fluid::centerAdvect(myArray3<double> &val){
+void Fluid::centerAdvect(myArray3<double> &val,double boundary_value){
     myArray3<double> old_val = val;
     for(int i=0;i<val.nx;++i){
         for(int j=0;j<val.ny;++j){
@@ -143,6 +144,8 @@ void Fluid::centerAdvect(myArray3<double> &val){
                 double adv_y = y - dt*TriLinearInterporation(x-0.5*dx, y, z-0.5*dx, v);
                 double adv_z = z - dt*TriLinearInterporation(x-0.5*dx, y-0.5*dx, z, w);
                 val.value[i][j][k] = TriLinearInterporation(adv_x- 0.5*dx, adv_y- 0.5*dx, adv_z- 0.5*dx, old_val);
+                
+                //if(i==0 || j==0 || k==0 || i == val.nx-1 || j==val.ny-1 ||k==val.nz-1)val.value[i][j][k] = boundary_value;
             }
         }
     }
@@ -226,7 +229,7 @@ void Fluid::project(){
     A.setFromTriplets(triplets.begin(), triplets.end());
     //std::cout << A << std::endl;
     Eigen::ConjugateGradient<SparseMatrix> solver;
-    solver.setTolerance(1e-4);
+    solver.setTolerance(1e-6);
     //ディリクレ境界条件の設定
 //    for(int i=0;i<A.outerSize();++i){
 //        for(SparseMatrix::InnerIterator it(A,i);it;++it){
@@ -243,6 +246,7 @@ void Fluid::project(){
     solver.compute(A);
     //px = solver.solve(b);
     px = solver.solveWithGuess(b, px);
+    //std::cout << solver.info() << std::endl;
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
@@ -263,6 +267,105 @@ void Fluid::project(){
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=1;k<Nz;k++)w.value[i][j][k] = w.value[i][j][k] - dt/(rho_tgt.value[i][j][k] +rho_amb.value[i][j][k]) * (p.value[i][j][k]-p.value[i][j][k-1])/dx;
+        }
+    }
+}
+void Fluid::cd_project(){
+    SparseMatrix A(Nx*Ny*Nz,Nx*Ny*Nz),B(Nx*Ny*Nz,Nx*Ny*Nz);
+    Eigen::VectorXd b = Eigen::VectorXd::Zero(Nx*Ny*Nz);
+    Eigen::VectorXd px(Nx*Ny*Nz);
+//    std::set<int> DirichletKey;
+//    std::vector<std::vector<int>>keys;
+    //Tripletの計算
+    std::vector<Triplet> triplets;
+    for(int i=0;i<Nx;i++){
+        for(int j=0;j<Ny;j++){
+            for(int k=0;k<Nz;k++){
+                px[i+j*Nx+k*Nx*Ny] = p.value[i][j][k];
+//                std::vector<int>key = {i,j,k};
+//                if(!map.contains(key)){
+                    //前処理でAが変更されてしまうので，境界条件として別で無理矢理設定する．
+//                if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1 ||k==Nz-1){
+//                    triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+k*Nx*Ny,1);
+//                    DirichletKey.insert(i+j*Nx+k*Nx*Ny);
+//                    continue;
+//                }
+//
+//                }
+                double scale = dt/((rho_tgt.value[i][j][k] + rho_amb.value[i][j][k])*dx*dx);
+                //std::cout << i << "," << j << std::endl;
+                double D[6] = {1.0,1.0,-1.0,-1.0,-1.0,1.0};//周囲6方向に向かって働く、圧力の向き
+                //double F[4] = {(double)(i<Nx-1),(double)(j<Ny-1),(double)(i>0),(double)(j>0)};//境界条件。壁なら0,流体なら1
+                
+                std::vector<int> F = {i<Nx-1,j<Ny-1,i>0,j>0,k>0,k<Nz-1};
+                double U[6] = {
+                    u.value[i+1][j][k],
+                    v.value[i][j+1][k],
+                    u.value[i][j][k],
+                    v.value[i][j][k],
+                    w.value[i][j][k],
+                    w.value[i][j][k+1]};
+                double sumP = 0;
+                for(int n=0;n<6;n++){
+                    sumP += -F[n]*scale;
+                    //sumP += scale;
+                    b(i+j*Nx+k*Nx*Ny) += D[n]*F[n]*U[n]/(dx);
+                }
+                //F = DirichletBoundaryCondition(i,j,k,map);
+//                    for(int n=0;n<6;n++){
+//                        std::cout << F_pri[n] << "," << F[n] << std::endl;
+//                    }
+                //triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+k*Nx*Ny, sumP);
+                if(F[0])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+1+j*Nx+k*Nx*Ny, F[0]*scale);
+                if(F[1])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+(j+1)*Nx+k*Nx*Ny, F[1]*scale);
+                if(F[2])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i-1+j*Nx+k*Nx*Ny, F[2]*scale);
+                if(F[3])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+(j-1)*Nx+k*Nx*Ny, F[3]*scale);
+                if(F[4])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+(k-1)*Nx*Ny, F[4]*scale);
+                if(F[5])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+(k+1)*Nx*Ny, F[5]*scale);
+            }
+        }
+    }
+    A.setFromTriplets(triplets.begin(), triplets.end());
+    //std::cout << A << std::endl;
+    Eigen::ConjugateGradient<SparseMatrix> solver;
+    solver.setTolerance(1e-6);
+    //ディリクレ境界条件の設定
+//    for(int i=0;i<A.outerSize();++i){
+//        for(SparseMatrix::InnerIterator it(A,i);it;++it){
+//            int id_col = it.col();
+//            int id_row = it.row();
+//            int k = id_col/(Nx*Ny);
+//            int tmp = id_col%(Nx*Ny);
+//            int j = tmp/Nx;
+//            int i = tmp%Nx;
+//            //std::cout << "i,j,k = " << i << "," << j << "," << k << std::endl;
+//            if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1 || k==Nz-1)it.valueRef()=1;
+//        }
+//    }
+    solver.compute(A);
+    //px = solver.solve(b);
+    px = solver.solveWithGuess(b, px);
+    //std::cout << solver.info() << std::endl;
+    for(int i=0;i<Nx;i++){
+        for(int j=0;j<Ny;j++){
+            for(int k=0;k<Nz;k++){
+                p.value[i][j][k] = px(i+j*Nx+k*Nx*Ny);
+            }
+        }
+    }
+    for(int i=1; i<Nx-1;i++){
+        for(int j=0;j<Ny;j++){
+            for(int k=0;k<Nz;k++)u.value[i][j][k] = u.value[i][j][k] - dt/(rho_tgt.value[i][j][k] +rho_amb.value[i][j][k])* (p.value[i+1][j][k]-p.value[i-1][j][k])/2*dx;
+        }
+    }
+    for(int i=0;i<Nx;i++){
+        for(int j=1;j<Ny-1;j++){
+            for(int k=0;k<Nz;k++)v.value[i][j][k] = v.value[i][j][k] - dt/(rho_tgt.value[i][j][k] +rho_amb.value[i][j][k]) * (p.value[i][j+1][k]-p.value[i][j-1][k])/2*dx;
+        }
+    }
+    for(int i=0;i<Nx;i++){
+        for(int j=0;j<Ny;j++){
+            for(int k=1;k<Nz-1;k++)w.value[i][j][k] = w.value[i][j][k] - dt/(rho_tgt.value[i][j][k] +rho_amb.value[i][j][k]) * (p.value[i][j][k+1]-p.value[i][j][k-1])/2*dx;
         }
     }
 }
@@ -312,7 +415,7 @@ void Fluid::addForce(){
     for(int i=1;i<Nx-1;i++){
         for(int j=1;j<Ny-1;j++){
             for(int k=1;k<Nz-1;k++){
-                //f.value[i][j][k] += getConfinement(i, j, k);
+                f.value[i][j][k] += getConfinement(i, j, k);
             }
         }
     }
@@ -343,19 +446,21 @@ void Fluid::addForce(){
 }
 
 void Fluid::oneloop(){
-    
     addForce();
     std::cout << "addForce" << std::endl;
     faceAdvect();
     //w.print();
     std::cout << "faceAdvect" << std::endl;
+    TD.startTimer("cd_project");
+    //cd_project();
     project();
+    times.push_back(TD.endTimer());
     //w.print();
     std::cout << "project" << std::endl;
-    centerAdvect(temp);
+    centerAdvect(temp,Tamb);
     std::cout << "centerAdvectTemp" << std::endl;
-    centerAdvect(rho_tgt);
-    centerAdvect(rho_amb);
+    centerAdvect(rho_tgt,0);
+    centerAdvect(rho_amb,0);
     cal_voxTrans(rho_tgt, vox_trans);
     //vox_trans.print();
     std::cout << "centerAdvectRho" << std::endl;
@@ -379,19 +484,18 @@ void Fluid::execute(){
     std::filesystem::create_directories(imageFolderName);
     std::filesystem::create_directories(transFolderName);
     setV(range);
-    //setPressure(range);
+    setPressure(range);
     setTemplature(range);
-    setDensity(range);
+    setDensity(Nx);
     
     for(int i=0;i<timestep;++i){
-        setTemplature(range);
-        setDensity(range);
-//        if(i < 10){
-//            setTemplature(range);
+//        setTemplature(range);
+//        setDensity(range);
+        if(i < 20){
+            setTemplature(range);
 //            setDensity(range);
-//            //setV(range);
-//        }
-//        oneloop();
+//            setV(range);
+        }
         std::string OutputVTK_pre = pressureFolderName+  "/output"+std::to_string(i)+".vtk";
         std::string OutputVTK_den = densityFolderName+  "/output"+std::to_string(i)+".vtk";
         std::string OutputVTK_tem = templatureFolderName+  "/output"+std::to_string(i)+".vtk";
@@ -407,4 +511,5 @@ void Fluid::execute(){
         oneloop();
         generateImage(outputPNG,vox_trans,rho_tgt);
     }
+    
 }

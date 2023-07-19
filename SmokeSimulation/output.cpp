@@ -32,3 +32,29 @@ void outputVTK(std::string OutputFileName,myArray3<double> &val,double dx){
     }
     writing_file.close();
 }
+void TimeDisplayer::startTimer(const char* s){
+    startTime = std::chrono::system_clock::now();
+    str = s;
+}
+double TimeDisplayer::endTimer(){
+    endTime = std::chrono::system_clock::now();
+    double time = static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count());
+    std::cout << str << ":" << time << "ms" << std::endl;
+    return time;
+    //std::cout << std::endl;
+}
+//void outputPLT(std::string OutputFileName ,std::string pltFileName,std::vector<double> &data){
+//    //vertex
+//    std::ofstream writing_file;
+//    std::filesystem::create_directories("outputData");
+//    writing_file.open("outputData/" + OutputFileName + "_v.dat",std::ios::out);
+//    writing_file.close();
+//    writing_file.open(pltFileName , std::ios::out);
+//    std::filesystem::create_directories("protImage");
+//    writing_file << "plot " << "'outputData/" + OutputFileName + "_v.dat'"<<" w linespoint pointsize 2 pointtype 4" << std::endl;
+//    writing_file << "set terminal jpeg" << std::endl;
+//    writing_file << "set output " << "'outputImage/" + OutputFileName +".jpeg'" << std::endl;
+//    writing_file << "replot" << std::endl;
+//    writing_file.close();
+//
+//}
