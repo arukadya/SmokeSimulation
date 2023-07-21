@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.141592653-p4.0.0-220214-2.6 (utf8.euc) (TeX Live 2022) (preloaded format=platex 2022.10.15)  21 JUL 2023 15:02
+This is e-pTeX, Version 3.141592653-p4.0.0-220214-2.6 (utf8.euc) (TeX Live 2022) (preloaded format=platex 2022.10.15)  21 JUL 2023 18:44
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -383,41 +383,57 @@ LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 6.72699pt on input line 68.
+(Font)              scaled to size 6.72699pt on input line 69.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 4.805pt on input line 68.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 68.
+(Font)              scaled to size 4.805pt on input line 69.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 69.
 
 (/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 68.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 69.
 
 
 (/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 9.60999pt on input line 68.
+(Font)              scaled to size 9.60999pt on input line 69.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 6.72699pt on input line 68.
+(Font)              scaled to size 6.72699pt on input line 69.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 4.805pt on input line 68.
- [1
+(Font)              scaled to size 4.805pt on input line 69.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 78.
+LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
+(Font)              scaled to size 9.60999pt on input line 78.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 78.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 9.60999pt on input line 78.
+
+
+LaTeX Warning: Reference `eq:Navie' on page 1 undefined on input line 78.
+
+[1
 
 
 ]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [2]
-(./Mthesis_PR.aux) ) 
-Here is how much of TeX's memory you used:
- 5371 strings out of 478724
- 87601 string characters out of 5858391
- 395661 words of memory out of 5000000
- 23746 multiletter control sequences out of 15000+600000
- 483307 words of font info for 94 fonts, out of 8000000 for 9000
- 934 hyphenation exceptions out of 8191
- 55i,7n,63p,927b,682s stack positions out of 10000i,1000n,20000p,200000b,200000s
+(./Mthesis_PR.aux)
 
-Output written on Mthesis_PR.dvi (2 pages, 14060 bytes).
+LaTeX Warning: There were undefined references.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 5370 strings out of 478724
+ 87580 string characters out of 5858391
+ 394651 words of memory out of 5000000
+ 23745 multiletter control sequences out of 15000+600000
+ 483496 words of font info for 95 fonts, out of 8000000 for 9000
+ 934 hyphenation exceptions out of 8191
+ 55i,7n,63p,1059b,682s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+Output written on Mthesis_PR.dvi (2 pages, 13056 bytes).
