@@ -34,8 +34,8 @@
 #define Ramb 1
 #define g0 9.8
 #define beta 100
-#define epcilon 1e-4
-#define timestep 100
+#define epcilon 1e-5
+#define timestep 200
 using ScalarType = double;
 using IndexType = int64_t;
 using Triplet = Eigen::Triplet<ScalarType,IndexType>;
@@ -73,7 +73,6 @@ struct Fluid{
     void setPressure(int set_range);
     void setV(int set_range);
     void project();
-    void cd_project();
 //    void project(myMap &map);
     void faceAdvect();
     void centerAdvect(myArray3<double> &val,double boundary_value);

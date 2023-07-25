@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.141592653-p4.0.0-220214-2.6 (utf8.euc) (TeX Live 2022) (preloaded format=platex 2022.10.15)  21 JUL 2023 18:44
+This is e-pTeX, Version 3.141592653-p4.0.0-220214-2.6 (utf8.euc) (TeX Live 2022) (preloaded format=platex 2022.10.15)  25 JUL 2023 03:34
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -350,90 +350,73 @@ LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <12> not available
 (Font)              Font shape `JY1/gt/m/n' tried instead on input line 46.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
 (Font)              scaled to size 11.53198pt on input line 46.
-File: fd_conf_73.png Graphic file (type bmp)
-<fd_conf_73.png>
-LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 52.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 52.
-LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <8> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 52.
-LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 7.68799pt on input line 52.
-LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <8> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 52.
-LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 7.68799pt on input line 52.
-File: cd_smoke.png Graphic file (type bmp)
-<cd_smoke.png>
-
-Overfull \hbox (2.22221pt too wide) in paragraph at lines 49--62
-[][] [] 
- []
-
-LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <9> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 62.
-LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 62.
-LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <9> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 62.
-LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 62.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
+(Font)              scaled to size 6.72699pt on input line 68.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 6.72699pt on input line 69.
-LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 4.805pt on input line 69.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 69.
+(Font)              scaled to size 4.805pt on input line 68.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 68.
 
 (/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 69.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 68.
 
 
 (/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 9.60999pt on input line 69.
+(Font)              scaled to size 9.60999pt on input line 68.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 6.72699pt on input line 69.
+(Font)              scaled to size 6.72699pt on input line 68.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 4.805pt on input line 69.
-LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 78.
-LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 9.60999pt on input line 78.
-LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 78.
-LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 9.60999pt on input line 78.
-
-
-LaTeX Warning: Reference `eq:Navie' on page 1 undefined on input line 78.
-
-[1
+(Font)              scaled to size 4.805pt on input line 68.
+ [1
 
 
 ]
+File: center_smoke.png Graphic file (type bmp)
+<center_smoke.png>
+LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 105.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 105.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <9> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 105.
+LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 105.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <9> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 105.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 105.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [2]
-(./Mthesis_PR.aux)
+LaTeX Font Info:    Font shape `JT1/mc/m/it' in size <10> not available
+(Font)              Font shape `JT1/mc/m/n' tried instead on input line 116.
+LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
+(Font)              scaled to size 9.60999pt on input line 116.
+LaTeX Font Info:    Font shape `JY1/mc/m/it' in size <10> not available
+(Font)              Font shape `JY1/mc/m/n' tried instead on input line 116.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 9.60999pt on input line 116.
 
-LaTeX Warning: There were undefined references.
+Underfull \hbox (badness 6758) in paragraph at lines 125--126
+\OT1/cmr/m/it/10 Eu-ro-graph-ics - Short Pa-pers\OT1/cmr/m/n/10 , 2019. DOI:
+ []
 
- ) 
+[2] (./Mthesis_PR.aux) ) 
 Here is how much of TeX's memory you used:
- 5370 strings out of 478724
- 87580 string characters out of 5858391
+ 5348 strings out of 478724
+ 87219 string characters out of 5858391
  394651 words of memory out of 5000000
- 23745 multiletter control sequences out of 15000+600000
- 483496 words of font info for 95 fonts, out of 8000000 for 9000
+ 23725 multiletter control sequences out of 15000+600000
+ 483063 words of font info for 92 fonts, out of 8000000 for 9000
  934 hyphenation exceptions out of 8191
- 55i,7n,63p,1059b,682s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 55i,5n,63p,882b,521s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on Mthesis_PR.dvi (2 pages, 13056 bytes).
+Output written on Mthesis_PR.dvi (2 pages, 14176 bytes).

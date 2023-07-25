@@ -151,48 +151,16 @@ void Fluid::centerAdvect(myArray3<double> &val,double boundary_value){
     }
 }
 
-//std::vector<int>Fluid::DirichletBoundaryCondition(int i,int j,int k,myMap &map){
-//    std::vector<int>ret(6,1);
-//    std::vector<std::vector<int>>keys = {{i+1,j,k},{i,j+1,k},{i-1,j,k},{i,j-1,k},{i,j,k-1},{i,j,k+1}};
-//    if(i == Nx-1)ret[0] = 0;
-//    else if(!map.contains(keys[0]))ret[0] = 0;
-//    if(j == Ny-1)ret[1] = 0;
-//    else if(!map.contains(keys[1]))ret[1] = 0;
-//
-//    if(i == 0)ret[2] = 0;
-//    else if(!map.contains(keys[2]))ret[2] = 0;
-//    if(j == 0)ret[3] = 0;
-//    else if(!map.contains(keys[3]))ret[3] = 0;
-//
-//    if(k == 0)ret[4] = 0;
-//    else if(!map.contains(keys[4]))ret[4] = 0;
-//    if(k == Nz-1)ret[5] = 0;
-//    else if(!map.contains(keys[5]))ret[5] = 0;
-//    return ret;
-//}
-//void Fluid::project(myMap &map){
 void Fluid::project(){
     SparseMatrix A(Nx*Ny*Nz,Nx*Ny*Nz),B(Nx*Ny*Nz,Nx*Ny*Nz);
     Eigen::VectorXd b = Eigen::VectorXd::Zero(Nx*Ny*Nz);
     Eigen::VectorXd px(Nx*Ny*Nz);
-//    std::set<int> DirichletKey;
-//    std::vector<std::vector<int>>keys;
     //Tripletの計算
     std::vector<Triplet> triplets;
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=0;k<Nz;k++){
                 px[i+j*Nx+k*Nx*Ny] = p.value[i][j][k];
-//                std::vector<int>key = {i,j,k};
-//                if(!map.contains(key)){
-                    //前処理でAが変更されてしまうので，境界条件として別で無理矢理設定する．
-//                if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1 ||k==Nz-1){
-//                    triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+k*Nx*Ny,1);
-//                    DirichletKey.insert(i+j*Nx+k*Nx*Ny);
-//                    continue;
-//                }
-//
-//                }
                 double scale = dt/((rho_tgt.value[i][j][k] + rho_amb.value[i][j][k])*dx*dx);
                 //std::cout << i << "," << j << std::endl;
                 double D[6] = {1.0,1.0,-1.0,-1.0,-1.0,1.0};//周囲6方向に向かって働く、圧力の向き
@@ -212,10 +180,6 @@ void Fluid::project(){
                     //sumP += scale;
                     b(i+j*Nx+k*Nx*Ny) += D[n]*F[n]*U[n]/(dx);
                 }
-                //F = DirichletBoundaryCondition(i,j,k,map);
-//                    for(int n=0;n<6;n++){
-//                        std::cout << F_pri[n] << "," << F[n] << std::endl;
-//                    }
                 triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+k*Nx*Ny, sumP);
                 if(F[0])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+1+j*Nx+k*Nx*Ny, F[0]*scale);
                 if(F[1])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+(j+1)*Nx+k*Nx*Ny, F[1]*scale);
@@ -230,19 +194,6 @@ void Fluid::project(){
     //std::cout << A << std::endl;
     Eigen::ConjugateGradient<SparseMatrix> solver;
     solver.setTolerance(1e-6);
-    //ディリクレ境界条件の設定
-//    for(int i=0;i<A.outerSize();++i){
-//        for(SparseMatrix::InnerIterator it(A,i);it;++it){
-//            int id_col = it.col();
-//            int id_row = it.row();
-//            int k = id_col/(Nx*Ny);
-//            int tmp = id_col%(Nx*Ny);
-//            int j = tmp/Nx;
-//            int i = tmp%Nx;
-//            //std::cout << "i,j,k = " << i << "," << j << "," << k << std::endl;
-//            if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1 || k==Nz-1)it.valueRef()=1;
-//        }
-//    }
     solver.compute(A);
     //px = solver.solve(b);
     px = solver.solveWithGuess(b, px);
@@ -267,105 +218,6 @@ void Fluid::project(){
     for(int i=0;i<Nx;i++){
         for(int j=0;j<Ny;j++){
             for(int k=1;k<Nz;k++)w.value[i][j][k] = w.value[i][j][k] - dt/(rho_tgt.value[i][j][k] +rho_amb.value[i][j][k]) * (p.value[i][j][k]-p.value[i][j][k-1])/dx;
-        }
-    }
-}
-void Fluid::cd_project(){
-    SparseMatrix A(Nx*Ny*Nz,Nx*Ny*Nz),B(Nx*Ny*Nz,Nx*Ny*Nz);
-    Eigen::VectorXd b = Eigen::VectorXd::Zero(Nx*Ny*Nz);
-    Eigen::VectorXd px(Nx*Ny*Nz);
-//    std::set<int> DirichletKey;
-//    std::vector<std::vector<int>>keys;
-    //Tripletの計算
-    std::vector<Triplet> triplets;
-    for(int i=0;i<Nx;i++){
-        for(int j=0;j<Ny;j++){
-            for(int k=0;k<Nz;k++){
-                px[i+j*Nx+k*Nx*Ny] = p.value[i][j][k];
-//                std::vector<int>key = {i,j,k};
-//                if(!map.contains(key)){
-                    //前処理でAが変更されてしまうので，境界条件として別で無理矢理設定する．
-//                if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1 ||k==Nz-1){
-//                    triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+k*Nx*Ny,1);
-//                    DirichletKey.insert(i+j*Nx+k*Nx*Ny);
-//                    continue;
-//                }
-//
-//                }
-                double scale = dt/((rho_tgt.value[i][j][k] + rho_amb.value[i][j][k])*dx*dx);
-                //std::cout << i << "," << j << std::endl;
-                double D[6] = {1.0,1.0,-1.0,-1.0,-1.0,1.0};//周囲6方向に向かって働く、圧力の向き
-                //double F[4] = {(double)(i<Nx-1),(double)(j<Ny-1),(double)(i>0),(double)(j>0)};//境界条件。壁なら0,流体なら1
-                
-                std::vector<int> F = {i<Nx-1,j<Ny-1,i>0,j>0,k>0,k<Nz-1};
-                double U[6] = {
-                    u.value[i+1][j][k],
-                    v.value[i][j+1][k],
-                    u.value[i][j][k],
-                    v.value[i][j][k],
-                    w.value[i][j][k],
-                    w.value[i][j][k+1]};
-                double sumP = 0;
-                for(int n=0;n<6;n++){
-                    sumP += -F[n]*scale;
-                    //sumP += scale;
-                    b(i+j*Nx+k*Nx*Ny) += D[n]*F[n]*U[n]/(dx);
-                }
-                //F = DirichletBoundaryCondition(i,j,k,map);
-//                    for(int n=0;n<6;n++){
-//                        std::cout << F_pri[n] << "," << F[n] << std::endl;
-//                    }
-                //triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+k*Nx*Ny, sumP);
-                if(F[0])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+1+j*Nx+k*Nx*Ny, F[0]*scale);
-                if(F[1])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+(j+1)*Nx+k*Nx*Ny, F[1]*scale);
-                if(F[2])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i-1+j*Nx+k*Nx*Ny, F[2]*scale);
-                if(F[3])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+(j-1)*Nx+k*Nx*Ny, F[3]*scale);
-                if(F[4])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+(k-1)*Nx*Ny, F[4]*scale);
-                if(F[5])triplets.emplace_back(i+j*Nx+k*Nx*Ny,i+j*Nx+(k+1)*Nx*Ny, F[5]*scale);
-            }
-        }
-    }
-    A.setFromTriplets(triplets.begin(), triplets.end());
-    //std::cout << A << std::endl;
-    Eigen::ConjugateGradient<SparseMatrix> solver;
-    solver.setTolerance(1e-6);
-    //ディリクレ境界条件の設定
-//    for(int i=0;i<A.outerSize();++i){
-//        for(SparseMatrix::InnerIterator it(A,i);it;++it){
-//            int id_col = it.col();
-//            int id_row = it.row();
-//            int k = id_col/(Nx*Ny);
-//            int tmp = id_col%(Nx*Ny);
-//            int j = tmp/Nx;
-//            int i = tmp%Nx;
-//            //std::cout << "i,j,k = " << i << "," << j << "," << k << std::endl;
-//            if(i==0 || j==0 || k==0 || i == Nx-1 || j==Ny-1 || k==Nz-1)it.valueRef()=1;
-//        }
-//    }
-    solver.compute(A);
-    //px = solver.solve(b);
-    px = solver.solveWithGuess(b, px);
-    //std::cout << solver.info() << std::endl;
-    for(int i=0;i<Nx;i++){
-        for(int j=0;j<Ny;j++){
-            for(int k=0;k<Nz;k++){
-                p.value[i][j][k] = px(i+j*Nx+k*Nx*Ny);
-            }
-        }
-    }
-    for(int i=1; i<Nx-1;i++){
-        for(int j=0;j<Ny;j++){
-            for(int k=0;k<Nz;k++)u.value[i][j][k] = u.value[i][j][k] - dt/(rho_tgt.value[i][j][k] +rho_amb.value[i][j][k])* (p.value[i+1][j][k]-p.value[i-1][j][k])/2*dx;
-        }
-    }
-    for(int i=0;i<Nx;i++){
-        for(int j=1;j<Ny-1;j++){
-            for(int k=0;k<Nz;k++)v.value[i][j][k] = v.value[i][j][k] - dt/(rho_tgt.value[i][j][k] +rho_amb.value[i][j][k]) * (p.value[i][j+1][k]-p.value[i][j-1][k])/2*dx;
-        }
-    }
-    for(int i=0;i<Nx;i++){
-        for(int j=0;j<Ny;j++){
-            for(int k=1;k<Nz-1;k++)w.value[i][j][k] = w.value[i][j][k] - dt/(rho_tgt.value[i][j][k] +rho_amb.value[i][j][k]) * (p.value[i][j][k+1]-p.value[i][j][k-1])/2*dx;
         }
     }
 }
