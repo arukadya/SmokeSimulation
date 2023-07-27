@@ -33,7 +33,7 @@
 #define p0 0
 #define Ramb 1
 #define g0 9.8
-#define beta 100
+#define beta 75
 #define epcilon 1e-5
 #define timestep 200
 using ScalarType = double;

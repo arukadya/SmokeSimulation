@@ -318,7 +318,7 @@ void Fluid::oneloop(){
     std::cout << "centerAdvectRho" << std::endl;
 }
 void Fluid::execute(){
-    dx = 0.1;
+    dx = 0.2;
     dt = 0.01;
 //    setDensity();
 //    setTemplature();
